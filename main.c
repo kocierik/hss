@@ -5,21 +5,23 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef struct machine{
+  char *name;
+  struct machine *next;
+}machinelist;
+
 int main() {
   WINDOW *w;
+  machinelist listName;
   
   struct passwd *pw = getpwuid(getuid());
   char *homedir = pw->pw_dir;
   char c;
-  strcat(homedir,"/.ssh/known_hosts");
+  bool checkSpace = false;
+  strcat(homedir,"/.ssh/known_hosts.old");
   FILE *file = fopen(homedir,"r"); 
 
-  do {
-    c = fgetc(file);
-    printf("%c", c);
-  } while (c != EOF);
- 
-    fclose(file);
+
   
   char list[5][7] = { "One", "Two", "Three", "Four", "Five" };
   char item[8];
@@ -65,4 +67,22 @@ int main() {
   }
   delwin(w);
   endwin();
+
+
+    do {
+    c = fgetc(file);
+    if(c != ' ' && !checkSpace){
+      printf("%c", c);
+    } 
+    else if(c == '\n'){
+      printf("\n");
+      checkSpace = false;
+    }
+     else{
+      checkSpace = true;
+    }
+  } while (c != EOF);
+ 
+    // printf("%s",listName.name);
+    fclose(file);
 }
