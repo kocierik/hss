@@ -11,4 +11,4 @@ main.o: main.c
 
 
 clean:
-	rm *.o
+	rm *.o main *.out

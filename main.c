@@ -4,20 +4,37 @@
 #include <pwd.h>
 #include <stdio.h>
 #include <string.h>
-
-typedef struct machine{
+#include <stdlib.h>
+struct machine{
   char *name;
   struct machine *next;
-}machinelist;
+};
+
+int addNodeBottom(char *name, struct machine *head){
+    struct machine *newNode = (struct machine*)malloc(sizeof(struct machine));
+    newNode->name = (char *) malloc(100);
+    strcpy(newNode->name,name);
+    newNode->next = NULL; 
+
+    if(head->next == NULL) head->next = newNode;
+    else{
+      struct machine *current = head;
+      while (current->next != NULL) current = current->next;
+      current->next = newNode;
+    }
+    return 0;
+}
+
+
+
 
 int main() {
   WINDOW *w;
-  machinelist listName;
   
   struct passwd *pw = getpwuid(getuid());
   char *homedir = pw->pw_dir;
-  char c;
-  bool checkSpace = false;
+  char *line = NULL;
+  // bool checkSpace = false;
   strcat(homedir,"/.ssh/known_hosts.old");
   FILE *file = fopen(homedir,"r"); 
 
@@ -68,21 +85,26 @@ int main() {
   delwin(w);
   endwin();
 
+  ssize_t read;
+  size_t len = 0;
+  char *text = NULL;
+  char *text2 = NULL;
+  
+  struct machine* headList = (struct machine*)malloc(sizeof(struct machine));
+  headList->next = NULL;
 
-    do {
-    c = fgetc(file);
-    if(c != ' ' && !checkSpace){
-      printf("%c", c);
-    } 
-    else if(c == '\n'){
-      printf("\n");
-      checkSpace = false;
-    }
-     else{
-      checkSpace = true;
-    }
-  } while (c != EOF);
- 
-    // printf("%s",listName.name);
+  
+
+  while ((read = getline(&line, &len, file)) != -1) {
+    text = strtok(line,",");
+    text2 = strtok(line," ");
+    // printf("%s\n",text);
+    addNodeBottom(text,headList);
+  }
+  while (headList != NULL){
+    printf("%s\n",headList->name);
+    headList = headList->next;
+  }
+
     fclose(file);
 }
