@@ -9,6 +9,7 @@
 struct machine{
   int len;
   char *name;
+  char *psw;
   struct machine *next;
   struct machine *prev;
 };
@@ -61,6 +62,7 @@ struct machine* parseFile(){
   strcat(homedir,"/.ssh/known_hosts.old");
   FILE *file = fopen(homedir,"r"); 
 
+
   ssize_t read;
   char *line = NULL;
   size_t len = 0;
@@ -73,13 +75,37 @@ struct machine* parseFile(){
     strtok(line," ");
     addNodeBottom(text,headList);
   }
+  fseek(file,0,SEEK_SET);
   fclose(file);
+
   return headList;
+}
+
+
+void parsePsw(){
+  struct passwd *pw = getpwuid(getuid());
+  char *homedir = pw->pw_dir;
+  strcat(homedir,"/.ssh/ps.old");
+  FILE *file = fopen(homedir,"r"); 
+
+
+  ssize_t read;
+  char *line = NULL;
+  size_t len = 0;
+  char *text = NULL;  
+
+  while ((read = getline(&line, &len, file)) != -1) {
+    text = strtok(line,","); 
+    printf("\n%s",text);
+  }
+  fclose(file);
 }
 
 
 int main() {
   WINDOW *w;
+  // parsePsw();
+  
   struct machine *temp = parseFile();
   struct machine *headList = temp;
   headList = headList->next;
@@ -87,7 +113,6 @@ int main() {
   int lenHostname = listLen(headList);
   struct machine *movePt = headList;
   int maxLen = maxTextLength(movePt);
-
 
 
   int ch, i = 0;
@@ -127,6 +152,8 @@ int main() {
           movePt = movePt->next;
           break;
         }
+      case KEY_ENTER:
+        break;
     }
     wattron( w, A_STANDOUT );
     mvwprintw( w, i+1, 2, "%s", movePt->name);
