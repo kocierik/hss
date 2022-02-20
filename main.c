@@ -42,6 +42,19 @@ int listLen(struct machine *list){
   return i;
 }
 
+int maxTextLength(struct machine *list){
+  int i = 0, max = 0;
+  while (list != NULL){  
+    while (list->name[i] != '\0'){
+      i++;
+    }
+    if(i>max) max = i;
+    i = 0;
+    list = list->next;
+  }
+  return max;
+}
+
 struct machine* parseFile(){
   struct passwd *pw = getpwuid(getuid());
   char *homedir = pw->pw_dir;
@@ -56,9 +69,8 @@ struct machine* parseFile(){
   headList->next = NULL;
 
   while ((read = getline(&line, &len, file)) != -1) {
-    text = strtok(line,",");
+    text = strtok(line,","); 
     strtok(line," ");
-    // printf("%s\n",text);
     addNodeBottom(text,headList);
   }
   fclose(file);
@@ -66,32 +78,28 @@ struct machine* parseFile(){
 }
 
 
-
-
 int main() {
   WINDOW *w;
-  int lenList = 0;
   struct machine *temp = parseFile();
   struct machine *headList = temp;
   headList = headList->next;
   free(temp);
-  headList->len = listLen(headList);
+  int lenHostname = listLen(headList);
   struct machine *movePt = headList;
+  int maxLen = maxTextLength(movePt);
 
 
 
-  char item[8];
   int ch, i = 0;
   initscr(); 
-  w = newwin(listLen(headList)+2, 45, 1, 1); 
+  w = newwin(lenHostname+2, maxLen+5, 1, 1); 
   box(w, 0, 0); 
   
-  for( i=0; i<9; i++ ) {
+  for( i=0; i<lenHostname; i++ ) {
     if( i == 0 ) 
     wattron( w, A_STANDOUT ); // highlights the first item.
     else
       wattroff( w, A_STANDOUT );
-    // sprintf(item, "%s", headList->name);
     mvwprintw( w, i+1, 2, "%s", movePt->name );
     movePt = movePt->next;
     }
@@ -114,7 +122,7 @@ int main() {
             break;
           }
       case KEY_DOWN:
-        if(i<8){
+        if(i<lenHostname-1){
           i++;
           movePt = movePt->next;
           break;
