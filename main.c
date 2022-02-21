@@ -56,13 +56,32 @@ int maxTextLength(struct machine *list){
   return max;
 }
 
-struct machine* parseFile(){
-  struct passwd *pw = getpwuid(getuid());
-  char *homedir = pw->pw_dir;
-  strcat(homedir,"/.ssh/known_hosts.old");
-  FILE *file = fopen(homedir,"r"); 
+void parsePsw(char *pswPath){
+  FILE *file;
+  if ((file = fopen(pswPath,"r")) == NULL){
+      printf("Error! opening file");
+      exit(1);
+  }
 
+  ssize_t read;
+  char *line = NULL;
+  size_t len = 0;
+  char *text = NULL;  
 
+  while ((read = getline(&line, &len, file)) != -1) {
+    text = strtok(line,","); 
+    printf("%s\n",line);
+  }
+
+  fclose(file);
+}
+
+struct machine* parseFile(char* homedir){
+  FILE *file;
+  if ((file = fopen(homedir,"r")) == NULL){
+      printf("Error! opening file");
+      exit(1);
+  }
   ssize_t read;
   char *line = NULL;
   size_t len = 0;
@@ -74,39 +93,29 @@ struct machine* parseFile(){
     text = strtok(line,","); 
     strtok(line," ");
     addNodeBottom(text,headList);
+    printf("%s\n",line);
   }
-  fseek(file,0,SEEK_SET);
+    printf("\n");
   fclose(file);
-
   return headList;
 }
 
 
-void parsePsw(){
-  struct passwd *pw = getpwuid(getuid());
-  char *homedir = pw->pw_dir;
-  strcat(homedir,"/.ssh/ps.old");
-  FILE *file = fopen(homedir,"r"); 
 
-
-  ssize_t read;
-  char *line = NULL;
-  size_t len = 0;
-  char *text = NULL;  
-
-  while ((read = getline(&line, &len, file)) != -1) {
-    text = strtok(line,","); 
-    printf("\n%s",text);
-  }
-  fclose(file);
-}
 
 
 int main() {
   WINDOW *w;
-  // parsePsw();
-  
-  struct machine *temp = parseFile();
+  struct passwd *pw = getpwuid(getuid());
+  char *homedir = pw->pw_dir;
+  char pswPath[100];
+  strcpy(pswPath,homedir);
+  strcat(homedir,"/.ssh/known_hosts.old");
+  strcat(pswPath,"/.ssh/ps");
+
+  struct machine *temp = parseFile(homedir);
+  parsePsw(pswPath);  
+
   struct machine *headList = temp;
   headList = headList->next;
   free(temp);
