@@ -56,31 +56,37 @@ int maxTextLength(struct machine *list){
   return max;
 }
 
-void parsePsw(char *pswPath){
+struct machine* parsePsw(char *pswPath, struct machine *list){
   FILE *file;
   if ((file = fopen(pswPath,"r")) == NULL){
-      printf("Error! opening file");
-      exit(1);
+    printf("Error! opening file");
+    exit(1);
   }
-
+  struct machine *tmp = list;
   ssize_t read;
   char *line = NULL;
   size_t len = 0;
   char *text = NULL;  
+  tmp = tmp->next;
 
   while ((read = getline(&line, &len, file)) != -1) {
-    text = strtok(line,","); 
-    printf("%s\n",line);
-  }
+    text = strtok(line,",");
+    tmp->psw = (char*) malloc(sizeof(char*)*100);
+    strcpy(tmp->psw,text);
+    tmp = tmp->next;
 
+  }
+  free(tmp);
   fclose(file);
+  return list;
 }
+
 
 struct machine* parseFile(char* homedir){
   FILE *file;
   if ((file = fopen(homedir,"r")) == NULL){
-      printf("Error! opening file");
-      exit(1);
+    printf("Error! opening file");
+    exit(1);
   }
   ssize_t read;
   char *line = NULL;
@@ -93,16 +99,11 @@ struct machine* parseFile(char* homedir){
     text = strtok(line,","); 
     strtok(line," ");
     addNodeBottom(text,headList);
-    printf("%s\n",line);
   }
-    printf("\n");
   fclose(file);
+
   return headList;
 }
-
-
-
-
 
 int main() {
   WINDOW *w;
@@ -114,11 +115,13 @@ int main() {
   strcat(pswPath,"/.ssh/ps");
 
   struct machine *temp = parseFile(homedir);
-  parsePsw(pswPath);  
+  temp = parsePsw(pswPath, temp);  
 
   struct machine *headList = temp;
   headList = headList->next;
   free(temp);
+
+
   int lenHostname = listLen(headList);
   struct machine *movePt = headList;
   int maxLen = maxTextLength(movePt);
@@ -144,6 +147,7 @@ int main() {
   keypad(w, TRUE); 
   curs_set( 0 ); 
   movePt = headList;
+
   while(( ch = wgetch(w)) != 'q'){ 
     // right pad with spaces to make the items appear with even width.
     mvwprintw( w, i+1, 2, "%s", movePt->name ); 
@@ -161,7 +165,7 @@ int main() {
           movePt = movePt->next;
           break;
         }
-      case KEY_ENTER:
+      case KEY_RIGHT:
         break;
     }
     wattron( w, A_STANDOUT );

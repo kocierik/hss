@@ -1,9 +1,0 @@
-{
-  "files.associations": {
-    "*.jsx": "javascriptreact",
-    "types.h": "c",
-    "iosfwd": "c",
-    "vector": "c",
-    "string.h": "c"
-  }
-}
