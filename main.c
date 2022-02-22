@@ -2,8 +2,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
-#include <stdio.h>
 #include <string.h>
+#include <libssh/libssh.h>
+#include <stdio.h>
 #include <stdlib.h>
 #define MAXLEN 50
 struct machine{
@@ -16,7 +17,7 @@ struct machine{
 
 int addNodeBottom(char *name, struct machine *head){
     struct machine *newNode = (struct machine*)malloc(sizeof(struct machine));
-    newNode->name = (char *) malloc(100);
+    newNode->name = (char *) malloc(200);
     strcpy(newNode->name,name);
     newNode->next = NULL; 
 
@@ -105,6 +106,7 @@ struct machine* parseFile(char* homedir){
   return headList;
 }
 
+
 int main() {
   WINDOW *w;
   struct passwd *pw = getpwuid(getuid());
@@ -112,7 +114,7 @@ int main() {
   char pswPath[100];
   strcpy(pswPath,homedir);
   strcat(homedir,"/.ssh/known_hosts.old");
-  strcat(pswPath,"/.ssh/ps");
+  strcat(pswPath,"/.ssh/.ps");
 
   struct machine *temp = parseFile(homedir);
   temp = parsePsw(pswPath, temp);  
@@ -157,15 +159,19 @@ int main() {
         if(i>0){
             i--;
             movePt = movePt->prev;
-            break;
           }
+        break;
       case KEY_DOWN:
         if(i<lenHostname-1){
           i++;
           movePt = movePt->next;
-          break;
         }
-      case KEY_RIGHT:
+        break;
+      case 10:
+        system("clear");       
+        char tmp[100] = "ssh ";
+        strcat(tmp,movePt->name);
+        system(tmp);
         break;
     }
     wattron( w, A_STANDOUT );
