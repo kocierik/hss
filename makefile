@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -c -Wall -std=c99
-OBJECTS = main.o
+OBJECTS = hss.o
 LIBRARY = -lncurses
 BINS = hss
 
 .PHONY: clean
 
-main: $(OBJECTS)
+all: $(OBJECTS)
 	$(CC) -o $(BINS) $(OBJECTS) $(LIBRARY) 
 
 clean:

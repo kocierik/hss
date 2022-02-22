@@ -1,4 +1,4 @@
-#include "main.h"
+#include "hss.h"
 
 int addNodeBottom(char *name, struct machine *head){
     struct machine *newNode = (struct machine*)malloc(sizeof(struct machine));
