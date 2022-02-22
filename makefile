@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -c -Wall 
+CFLAGS = -c -Wall -std=c99
 OBJECTS = main.o
 LIBRARY = -lncurses
 

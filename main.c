@@ -38,7 +38,7 @@ int addNodeBottom(char *name, struct machine *head){
 int listLen(struct machine *list){
   int i = 0;
   while (list != NULL){
-    i++;
+    if(list->psw != NULL) i++;
     list = list->next;
   }
   return i;
@@ -72,10 +72,11 @@ struct machine* parsePsw(char *pswPath, struct machine *list){
 
   while ((read = getline(&line, &len, file)) != -1) {
     text = strtok(line,",");
-    tmp->psw = (char*) malloc(sizeof(char*)*100);
-    strcpy(tmp->psw,text);
-    tmp = tmp->next;
-
+    if(tmp != NULL){
+      tmp->psw = (char*) malloc(sizeof(char*)*100);
+      strcpy(tmp->psw,text);
+      tmp = tmp->next;
+    }
   }
   free(tmp);
   fclose(file);
@@ -115,7 +116,7 @@ void printHost(int lenHostname, WINDOW *w, struct machine *movePt){
       wattroff( w, A_STANDOUT );
     mvwprintw( w, i+1, 2, "%s", movePt->name );
     movePt = movePt->next;
-    }
+  }
 }
 
 
