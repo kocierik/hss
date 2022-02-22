@@ -106,6 +106,18 @@ struct machine* parseFile(char* homedir){
   return headList;
 }
 
+void printHost(int lenHostname, WINDOW *w, struct machine *movePt){
+  box(w, 0, 0); 
+  for(int i=0; i<lenHostname; i++ ) {
+    if( i == 0 ) 
+      wattron( w, A_STANDOUT ); // highlights the first item.
+    else
+      wattroff( w, A_STANDOUT );
+    mvwprintw( w, i+1, 2, "%s", movePt->name );
+    movePt = movePt->next;
+    }
+}
+
 
 int main() {
   WINDOW *w;
@@ -132,16 +144,8 @@ int main() {
   int ch, i = 0;
   initscr(); 
   w = newwin(lenHostname+2, maxLen+5, 1, 1); 
-  box(w, 0, 0); 
   
-  for( i=0; i<lenHostname; i++ ) {
-    if( i == 0 ) 
-    wattron( w, A_STANDOUT ); // highlights the first item.
-    else
-      wattroff( w, A_STANDOUT );
-    mvwprintw( w, i+1, 2, "%s", movePt->name );
-    movePt = movePt->next;
-    }
+  printHost(lenHostname, w, movePt);
   
   wrefresh(w);
   i = 0;
@@ -153,8 +157,7 @@ int main() {
   while(( ch = wgetch(w)) != 'q'){ 
     // right pad with spaces to make the items appear with even width.
     mvwprintw( w, i+1, 2, "%s", movePt->name ); 
-
-    switch( ch ) {
+    switch(ch) {
       case KEY_UP:
         if(i>0){
             i--;
@@ -167,16 +170,22 @@ int main() {
           movePt = movePt->next;
         }
         break;
-      case 10:
+      case 10: // KEY_ENTER
         system("clear");       
         char tmp[100] = "ssh ";
         strcat(tmp,movePt->name);
         system(tmp);
+        system("clear");   
+        movePt = headList;
+        printHost(lenHostname, w, movePt); 
+        refresh();
+        i = 0;
         break;
     }
     wattron( w, A_STANDOUT );
     mvwprintw( w, i+1, 2, "%s", movePt->name);
     wattroff( w, A_STANDOUT );
+    box(w,0,0);
   }
   delwin(w);
   endwin();
