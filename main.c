@@ -1,19 +1,4 @@
-#include<ncurses.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
-#include <string.h>
-#include <libssh/libssh.h>
-#include <stdio.h>
-#include <stdlib.h>
-#define MAXLEN 50
-struct machine{
-  int len;
-  char *name;
-  char *psw;
-  struct machine *next;
-  struct machine *prev;
-};
+#include "main.h"
 
 int addNodeBottom(char *name, struct machine *head){
     struct machine *newNode = (struct machine*)malloc(sizeof(struct machine));
@@ -126,7 +111,7 @@ int main() {
   char *homedir = pw->pw_dir;
   char pswPath[100];
   strcpy(pswPath,homedir);
-  strcat(homedir,"/.ssh/known_hosts.old");
+  strcat(homedir,"/.ssh/known_hosts");
   strcat(pswPath,"/.ssh/.ps");
 
   struct machine *temp = parseFile(homedir);

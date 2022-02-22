@@ -2,13 +2,12 @@ CC = gcc
 CFLAGS = -c -Wall -std=c99
 OBJECTS = main.o
 LIBRARY = -lncurses
+BINS = hss
+
+.PHONY: clean
 
 main: $(OBJECTS)
-	$(CC) -o main $(OBJECTS) $(LIBRARY) && ./main
-
-main.o: main.c
-	$(CC) $(CFLAGS) main.c
-
+	$(CC) -o $(BINS) $(OBJECTS) $(LIBRARY) 
 
 clean:
-	rm *.o main *.out
+	rm -f *.o hss 
